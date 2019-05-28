@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qfedu.mapper.StoryMapper">
+	<resultMap id="BaseResultMap" type="com.qfedu.pojo.Story">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+		<result column="userid" property="userid" jdbcType="INTEGER" />
+		<result column="sendtime" property="sendtime" jdbcType="INTEGER" />
+		<result column="local" property="local" jdbcType="VARCHAR" />		
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, content, userid, sendtime, local
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from story
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from story
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.qfedu.pojo.Story">
+		<selectKey resultType="java.lang.Integer" keyProperty="id"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into story (content, userid, sendtime,
+		local)
+		values
+		(#{content,jdbcType=VARCHAR}, #{userid,jdbcType=INTEGER},
+		#{sendtime,jdbcType=INTEGER},
+		#{local,jdbcType=VARCHAR})
+	</insert>
+	<insert id="insertSelective" parameterType="com.qfedu.pojo.Story">
+		<selectKey resultType="java.lang.Integer" keyProperty="id"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into story
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="content != null">
+				content,
+			</if>
+			<if test="userid != null">
+				userid,
+			</if>
+			<if test="sendtime != null">
+				sendtime,
+			</if>
+			<if test="local != null">
+				local,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="content != null">
+				#{content,jdbcType=VARCHAR},
+			</if>
+			<if test="userid != null">
+				#{userid,jdbcType=INTEGER},
+			</if>
+			<if test="sendtime != null">
+				#{sendtime,jdbcType=INTEGER},
+			</if>
+			<if test="local != null">
+				#{local,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.qfedu.pojo.Story">
+		update story
+		<set>
+			<if test="content != null">
+				content = #{content,jdbcType=VARCHAR},
+			</if>
+			<if test="userid != null">
+				userid = #{userid,jdbcType=INTEGER},
+			</if>
+			<if test="sendtime != null">
+				sendtime = #{sendtime,jdbcType=INTEGER},
+			</if>
+			<if test="local != null">
+				local = #{local,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.qfedu.pojo.Story">
+		update story
+		set
+		content = #{content,jdbcType=VARCHAR},
+		userid =
+		#{userid,jdbcType=INTEGER},
+		sendtime = #{sendtime,jdbcType=INTEGER},
+		local = #{local,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<resultMap type="com.qfedu.pojo.Story" extends="BaseResultMap"
+		id="storyandimg">
+
+		<id column="storyid" property="id" jdbcType="INTEGER" />
+		<!-- 在user和story关系中story是一，user是多 -->
+		<!-- 在storyimg和story关系中story是一，storyimg是多 -->
+		<association property="user" javaType="com.qfedu.pojo.StoryUser">
+
+			<id column="userid" property="id" />
+			<result column="nickname" property="nickname" />
+			<result column="sex" property="sex" />
+			<result column="photo" property="photo" />
+
+		</association>
+		<collection property="imgs" ofType="com.qfedu.pojo.StoryImg">
+			<id column="storyimgid" property="id" />
+			<result column="imgurl" property="imgurl" />
+		</collection>
+
+	</resultMap>
+
+	<select id="selectStoryOrder" resultMap="storyandimg">
+		select
+		u.nickname as
+		nickname ,u.id as userid,u.photo as photo,u.sex as sex,s.content as
+		content,
+		s.id as storyid ,si.imgurl as imgurl,si.id as storyimgid
+
+		from
+		storyuser as u inner join story as s
+		on u.id=s.userid
+		left outer join
+		storyimg as si
+		on s.id=si.storyid
+
+	</select>
+
+</mapper>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link href="css/verify.css" />
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/verify.js"></script>
+
+<script type="text/javascript">
+	$(function() {
+		//为id为	mpanel2的div追加验证码显示，并且追加验证功能
+		$('#mpanel2').codeVerify({
+			type : 1,
+			width : '400px',
+			height : '50px',
+			fontSize : '30px',
+			codeLength : 6,
+			btnId : 'check-btn',
+			ready : function() {
+			},
+			success : function() {
+				alert('验证匹配！');
+			},
+			error : function() {
+				alert('验证码不匹配！');
+			}
+		});
+
+	})
+</script>
+
+</head>
+<body>
+
+	<form action="login" method="post">
+
+
+		<input type="text" name="username" /><br /> <input type="password"
+			name="password"><br />
+
+
+		<!-- 生成验证码的div -->
+		<div id="mpanel2"></div>
+		<input type="button" class="verify-btn" id="check-btn"> <input
+			type="submit" />
+	</form>
+</body>
+</html>

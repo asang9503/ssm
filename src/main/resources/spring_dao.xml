@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+
+	<!-- 开始spring注解扫描 -->
+	
+
+	<context:component-scan base-package="com.qfedu.mapper">
+	</context:component-scan>
+
+
+	<!-- 表示指定aop实现底层采用cglib的形式 -->
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+
+
+	<!-- ssm整合最重要的就是spring.xml文件的配置，主要有两个功能 1负责action,service,dao层对象的创建和依赖注入 
+		2负责帮助开发者维护第三方框架的初始化，比如mybatis，sqlsessionfactory的创建 -->
+
+	<!-- mybatis与spring整合之后最大的区别就是暂时不在需要mybatis_config.xml文件里。 之前mybatis_config.xml的目的就是为了配置sqlsessionfactory,那现在sqlsessionfactory由spring进行创建, 
+		将sqlsessionfactory声明成bean,那么之前在mybatis_config.xml的相关配置变成对bean的属性的依赖zhuru -->
+
+
+	<!-- 之前我们写在mybatis_confgig中的配置， mappers也需要在这里进行配置 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+
+		<!-- dataSource属性的值是另外一个bean，封装了数据库环境常量 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 自动扫描mapping.xml文件 -->
+		<property name="mapperLocations" value="classpath:com/qfedu/pojo/*.xml"></property>
+
+		<!-- 指定别名的包 ,会为包下所有的类创建别名，这样在mybatis的xml文件中就可以直接使用这些别名, 生成的别名的名字就是类名首字母小写 -->
+		<property name="typeAliasesPackage" value="com.qfedu.pojo" />
+
+		<!-- 在spring环境下使用pageHelper插件，需要指定mybatis的配置文件的路径 -->
+		<property name="configLocation" value="classpath:mybatis_conifg.xml"></property>
+
+	</bean>
+
+
+	<!-- 初始化数据源,并且使用dbcp连接池，c3p0等连接池步骤相同 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/zz805chooseclass" />
+		<property name="username" value="root" />
+		<property name="password" value="123" />
+		<!-- 初始化连接大小 -->
+		<property name="initialSize" value="0"></property>
+		<!-- 连接池最大数量 -->
+		<property name="maxActive" value="20"></property>
+		<!-- 连接池最大空闲 -->
+		<property name="maxIdle" value="20"></property>
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle" value="1"></property>
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait" value="6000"></property>
+	</bean>
+
+
+	<!-- Mybatis MapperScannerConfigurer 自动扫描 将Mapper接口生成代理注入到Spring -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 指定到mybatis的接口所在的包 -->
+		<property name="basePackage" value="com.qfedu.mapper" />
+
+		<!-- 还需要指定一个sqlsessionfacotry属性，就是根据这个属性完成对所有接口的代理，并且将代理类保存到ioc容器中,这些代理对象都是可以直接操作数据库的 -->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+	</bean>
+
+
+
+
+
+</beans>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="/zz805ssm/js/jquery.min.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$("#uploadbtn").click(function() {
+
+			//获取form表单中的数据
+			var formdata = new FormData(document.getElementById("uploadform"));
+
+			$.ajax({
+				url : "/zz805ssm/api/v1/uploadStory",
+				type : "post",
+				async : true,
+				data : formdata,
+				//告诉jquery不要设置请求的头部的类型，而是使用form表单本身设置上传类型
+				contentType : false,
+				//告诉jquery不要对数据进行处理
+
+				processData : false,
+				success : function(data) {
+					alert(data.code)
+				}
+
+			})
+
+		})
+
+	})
+</script>
+</head>
+<body>
+
+
+	<!-- ajax进行上传，并且有文件的时候 -->
+	<!-- 可使用jquery提供的form插件,会根据form表单的配置，发起一个ajax请求 -->
+	<!-- 使用jquery提供的FormData(form)对象,参数是一个from标签，将form中的所有的数据封装成一个FormData对象，我们直接将FormData进行指定为data属性的值即可 -->
+
+	<form action="" id="uploadform" enctype="multipart/form-data">
+		<textarea rows="20" cols="100" name="content"></textarea>
+		<input type="file" name="imgs" multiple="multiple" /> <input
+			type="button" id="uploadbtn">
+	</form>
+</body>
+</html>
